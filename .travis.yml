@@ -35,7 +35,8 @@ before_install:
   - pip install --user hererocks
   - hererocks here -r^ --$LUA
   - export PATH=$PATH:$PWD/here/bin
-  - sudo apt-get install libavro-dev
+  - sudo dpkg -i ./deps/linux/libavro23_1.8.2-1_amd64.deb
+  - sudo dpkg -i ./deps/linux/libavro-dev_1.8.2-1_amd64.deb
 
 install:
   - luarocks make rockspecs/lua-avro-scm-0.rockspec
