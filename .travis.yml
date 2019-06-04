@@ -9,10 +9,11 @@ python:
 
 sudo: false
 
-# addons:
-#   apt:
-#     packages:
-#       - libavro-dev
+addons:
+  apt:
+    packages:
+      - libjansson4
+      - libsnappy1v5
 
 env:
   matrix:
