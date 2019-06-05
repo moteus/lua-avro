@@ -29,6 +29,14 @@
 
 #endif
 
+#if LUA_VERSION_NUM >= 503 /* Lua 5.3 */
+
+#ifndef luaL_checklong
+#define luaL_checklong(L,n)     ((long)luaL_checkinteger(L, (n)))
+#endif
+
+#endif
+
 int
 lua_avro_push_schema(lua_State *L, avro_schema_t schema);
 
