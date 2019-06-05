@@ -23,6 +23,10 @@
 #define lua_objlen      lua_rawlen
 #endif
 
+#ifndef luaL_register
+#define luaL_register(L,n,l) (luaL_setfuncs(L, l, 0))
+#endif
+
 #endif
 
 int
