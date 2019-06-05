@@ -16,14 +16,14 @@ local print = print
 local setmetatable = setmetatable
 local string = string
 
-module "avro"
+local avro = require "avro.module"
 
 ------------------------------------------------------------------------
 -- Constants
 
 for k,v in pairs(ACC) do
    if string.sub(k,1,1) ~= "_" then
-      _M[k] = v
+      avro[k] = v
    end
 end
 
@@ -31,48 +31,50 @@ end
 ------------------------------------------------------------------------
 -- Copy a bunch of public functions from the submodules.
 
-ArraySchema = AS.ArraySchema
-EnumSchema = AS.EnumSchema
-FixedSchema = AS.FixedSchema
-LinkSchema = AS.LinkSchema
-MapSchema = AS.MapSchema
-RecordSchema = AS.RecordSchema
-Schema = AS.Schema
-UnionSchema = AS.UnionSchema
+avro.ArraySchema = AS.ArraySchema
+avro.EnumSchema = AS.EnumSchema
+avro.FixedSchema = AS.FixedSchema
+avro.LinkSchema = AS.LinkSchema
+avro.MapSchema = AS.MapSchema
+avro.RecordSchema = AS.RecordSchema
+avro.Schema = AS.Schema
+avro.UnionSchema = AS.UnionSchema
 
-ResolvedReader = AC.ResolvedReader
-ResolvedWriter = AC.ResolvedWriter
-open = AC.open
-raw_decode_value = AC.raw_decode_value
-raw_encode_value = AC.raw_encode_value
-raw_value = AC.raw_value
-wrapped_value = AC.wrapped_value
+avro.ResolvedReader = AC.ResolvedReader
+avro.ResolvedWriter = AC.ResolvedWriter
+avro.open = AC.open
+avro.raw_decode_value = AC.raw_decode_value
+avro.raw_encode_value = AC.raw_encode_value
+avro.raw_value = AC.raw_value
+avro.wrapped_value = AC.wrapped_value
 
-get_wrapper_class = AW.get_wrapper_class
-set_wrapper_class = AW.set_wrapper_class
-Wrapper = AW.Wrapper
-ArrayValue = AW.ArrayValue
-CompoundValue = AW.CompoundValue
-LongValue = AW.LongValue
-MapValue = AW.MapValue
-RecordValue = AW.RecordValue
-ScalarValue = AW.ScalarValue
-StringValue = AW.StringValue
-UnionValue = AW.UnionValue
+avro.get_wrapper_class = AW.get_wrapper_class
+avro.set_wrapper_class = AW.set_wrapper_class
+avro.Wrapper = AW.Wrapper
+avro.ArrayValue = AW.ArrayValue
+avro.CompoundValue = AW.CompoundValue
+avro.LongValue = AW.LongValue
+avro.MapValue = AW.MapValue
+avro.RecordValue = AW.RecordValue
+avro.ScalarValue = AW.ScalarValue
+avro.StringValue = AW.StringValue
+avro.UnionValue = AW.UnionValue
 
-boolean = AS.boolean
-bytes = AS.bytes
-double = AS.double
-float = AS.float
-int = AS.int
-long = AS.long
-null = AS.null
-_M.string = AS.string  -- need the _M b/c we import Lua's string above
+avro.boolean = AS.boolean
+avro.bytes = AS.bytes
+avro.double = AS.double
+avro.float = AS.float
+avro.int = AS.int
+avro.long = AS.long
+avro.null = AS.null
+avro.string = AS.string  -- need the _M b/c we import Lua's string above
 
-array = AS.array
-enum = AS.enum
-fixed = AS.fixed
-link = AS.link
-map = AS.map
-record = AS.record
-union = AS.union
+avro.array = AS.array
+avro.enum = AS.enum
+avro.fixed = AS.fixed
+avro.link = AS.link
+avro.map = AS.map
+avro.record = AS.record
+avro.union = AS.union
+
+return avro

@@ -6,20 +6,24 @@
 -- Please see the COPYING file in this distribution for license details.
 ------------------------------------------------------------------------
 
-module "avro.constants"
+local avro = require "avro.module"
 
-STRING  =  0
-BYTES   =  1
-INT     =  2
-LONG    =  3
-FLOAT   =  4
-DOUBLE  =  5
-BOOLEAN =  6
-NULL    =  7
-RECORD  =  8
-ENUM    =  9
-FIXED   = 10
-MAP     = 11
-ARRAY   = 12
-UNION   = 13
-LINK    = 14
+avro.constants = {
+   STRING  =  0;
+   BYTES   =  1;
+   INT     =  2;
+   LONG    =  3;
+   FLOAT   =  4;
+   DOUBLE  =  5;
+   BOOLEAN =  6;
+   NULL    =  7;
+   RECORD  =  8;
+   ENUM    =  9;
+   FIXED   = 10;
+   MAP     = 11;
+   ARRAY   = 12;
+   UNION   = 13;
+   LINK    = 14;
+}
+
+return avro.constants

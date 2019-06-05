@@ -33,7 +33,8 @@ local tonumber = tonumber
 local tostring = tostring
 local type = type
 
-module "avro.ffi.avro"
+local avro_module = require "avro.module"
+avro_module.ffi = {avro = {}}
 
 ffi.cdef [[
 void *malloc(size_t size);
@@ -222,10 +223,25 @@ local LuaAvroDataOutputFile
 
 for k,v in pairs(ACC) do
    if string.sub(k,1,1) ~= "_" then
-      _M[k] = v
+      avro_module.ffi.avro[k] = v
    end
 end
 
+local STRING  = ACC.STRING
+local BYTES   = ACC.BYTES
+local INT     = ACC.INT
+local LONG    = ACC.LONG
+local FLOAT   = ACC.FLOAT
+local DOUBLE  = ACC.DOUBLE
+local BOOLEAN = ACC.BOOLEAN
+local NULL    = ACC.NULL
+local RECORD  = ACC.RECORD
+local ENUM    = ACC.ENUM
+local FIXED   = ACC.FIXED
+local MAP     = ACC.MAP
+local ARRAY   = ACC.ARRAY
+local UNION   = ACC.UNION
+local LINK    = ACC.LINK
 
 ------------------------------------------------------------------------
 -- C type pointers
@@ -547,7 +563,7 @@ function Schema_class:type()
    return self.self[0].type
 end
 
-function Schema(json)
+function avro_module.ffi.avro.Schema(json)
    if getmetatable(json) == Schema_mt then
       return Schema_mt
    else
@@ -573,7 +589,7 @@ local v_int64 = ffi.new(int64_t_ptr)
 local v_size = ffi.new(size_t_ptr)
 local v_const_void_p = ffi.new(const_void_p_ptr)
 
-function raw_value(v_ud, should_decref)
+function avro_module.ffi.avro.raw_value(v_ud, should_decref)
    local self = LuaAvroValue()
    self:set_raw_value(v_ud, should_decref)
    return self
@@ -999,7 +1015,7 @@ function Value_class:encoded_size()
    return v_size[0]
 end
 
-function raw_encode_value(self, buf, size)
+function avro_module.ffi.avro.raw_encode_value(self, buf, size)
    local writer = avro.avro_writer_memory(buf, size)
    local rc = avro.avro_value_write(writer, self)
    avro.avro_writer_free(writer)
@@ -1220,12 +1236,14 @@ end
 --]==]
 
 LuaAvroValue = ffi.metatype([[avro_value_t]], Value_mt)
+avro_module.ffi.avro.LuaAvroValue = LuaAvroValue
 
 ------------------------------------------------------------------------
 -- ResolvedReaders
 
 local ResolvedReader_class = {}
 local ResolvedReader_mt = { __index = ResolvedReader_class }
+local LuaAvroResolvedReader = ffi.metatype([[LuaAvroResolvedReader]], ResolvedReader_mt)
 
 function ResolvedReader_class:new_raw_value()
    local value = LuaAvroValue()
@@ -1242,7 +1260,7 @@ function ResolvedReader_mt:__gc()
    end
 end
 
-function ResolvedReader(wschema, rschema)
+local function ResolvedReader(wschema, rschema)
    local resolver = LuaAvroResolvedReader()
    wschema = wschema:raw_schema().self
    rschema = rschema:raw_schema().self
@@ -1251,13 +1269,15 @@ function ResolvedReader(wschema, rschema)
    return resolver
 end
 
-LuaAvroResolvedReader = ffi.metatype([[LuaAvroResolvedReader]], ResolvedReader_mt)
+avro_module.ffi.avro.LuaAvroResolvedReader = LuaAvroResolvedReader
+avro_module.ffi.avro.ResolvedReader = ResolvedReader
 
 ------------------------------------------------------------------------
 -- ResolvedWriters
 
 local ResolvedWriter_class = {}
 local ResolvedWriter_mt = { __index = ResolvedWriter_class }
+local LuaAvroResolvedWriter = ffi.metatype([[LuaAvroResolvedWriter]], ResolvedWriter_mt)
 
 local memory_reader = avro.avro_reader_memory(nil, 0)
 
@@ -1269,7 +1289,7 @@ function ResolvedWriter_class:new_raw_value()
    return value
 end
 
-function raw_decode_value(resolver, buf, size, dest)
+local function raw_decode_value(resolver, buf, size, dest)
    avro.avro_reader_memory_set_source(memory_reader, buf, size)
    avro.avro_resolved_writer_set_dest(resolver.value, dest)
    local rc = avro.avro_value_read(memory_reader, resolver.value)
@@ -1297,7 +1317,7 @@ function ResolvedWriter_mt:__gc()
    end
 end
 
-function ResolvedWriter(wschema, rschema)
+local function ResolvedWriter(wschema, rschema)
    local resolver = LuaAvroResolvedWriter()
    wschema = wschema:raw_schema().self
    rschema = rschema:raw_schema().self
@@ -1308,7 +1328,9 @@ function ResolvedWriter(wschema, rschema)
    return resolver
 end
 
-LuaAvroResolvedWriter = ffi.metatype([[LuaAvroResolvedWriter]], ResolvedWriter_mt)
+avro_module.ffi.avro.LuaAvroResolvedWriter = LuaAvroResolvedWriter
+avro_module.ffi.avro.ResolvedWriter = ResolvedWriter
+avro_module.ffi.avro.raw_decode_value = raw_decode_value
 
 ------------------------------------------------------------------------
 -- Data files
@@ -1368,6 +1390,7 @@ end
 
 DataInputFile_mt.__gc = DataInputFile_class.close
 LuaAvroDataInputFile = ffi.metatype([[LuaAvroDataInputFile]], DataInputFile_mt)
+avro_module.ffi.avro.LuaAvroDataInputFile = LuaAvroDataInputFile
 
 local DataOutputFile_class = {}
 local DataOutputFile_mt = { __index = DataOutputFile_class }
@@ -1386,8 +1409,9 @@ end
 
 DataOutputFile_mt.__gc = DataOutputFile_class.close
 LuaAvroDataOutputFile = ffi.metatype([[LuaAvroDataOutputFile]], DataOutputFile_mt)
+avro_module.ffi.avro.LuaAvroDataOutputFile = LuaAvroDataOutputFile
 
-function open(path, mode, schema)
+function avro_module.ffi.avro.open(path, mode, schema)
    mode = mode or "r"
 
    if mode == "r" then
@@ -1407,3 +1431,5 @@ function open(path, mode, schema)
       error("Invalid mode "..mode)
    end
 end
+
+return avro_module.ffi.avro

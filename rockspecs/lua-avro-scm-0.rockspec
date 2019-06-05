@@ -38,6 +38,7 @@ build = {
          libdirs = {"$(AVRO_LIBDIR)"},
       },
       ["avro.ffi.avro"] = "src/avro/ffi/avro.lua",
+      ["avro.module"] = "src/avro/module.lua",
       ["avro.test"] = "src/avro/test.lua",
       ["avro.tests.raw"] = "src/avro/tests/raw.lua",
       ["avro.tests.schema"] = "src/avro/tests/schema.lua",

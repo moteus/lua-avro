@@ -24,12 +24,16 @@ local tonumber = tonumber
 local tostring = tostring
 local type = type
 
-module "avro.schema"
+local avro = require "avro.module"
+avro.schema = {}
+
 
 ------------------------------------------------------------------------
 -- Base schema class
 
-Schema = {}
+local Schema = {}
+avro.schema.Schema = Schema
+
 Schema.__mt = { __index=Schema }
 
 function Schema:to_json()
@@ -150,20 +154,22 @@ local function primitive_schema(name, schema_type, default_wrapper_class)
    return schema
 end
 
-boolean = primitive_schema("boolean", ACC.BOOLEAN, AW.ScalarValue)
-bytes = primitive_schema("bytes", ACC.BYTES, AW.StringValue)
-double = primitive_schema("double", ACC.DOUBLE, AW.ScalarValue)
-float = primitive_schema("float", ACC.FLOAT, AW.ScalarValue)
-int = primitive_schema("int", ACC.INT, AW.ScalarValue)
-long = primitive_schema("long", ACC.LONG, AW.LongValue)
-null = primitive_schema("null", ACC.NULL, AW.ScalarValue)
-string = primitive_schema("string", ACC.STRING, AW.StringValue)
+avro.schema.boolean = primitive_schema("boolean", ACC.BOOLEAN, assert(AW.ScalarValue))
+avro.schema.bytes   = primitive_schema("bytes",   ACC.BYTES,   assert(AW.StringValue))
+avro.schema.double  = primitive_schema("double",  ACC.DOUBLE,  assert(AW.ScalarValue))
+avro.schema.float   = primitive_schema("float",   ACC.FLOAT,   assert(AW.ScalarValue))
+avro.schema.int     = primitive_schema("int",     ACC.INT,     assert(AW.ScalarValue))
+avro.schema.long    = primitive_schema("long",    ACC.LONG,    assert(AW.LongValue))
+avro.schema.null    = primitive_schema("null",    ACC.NULL,    assert(AW.ScalarValue))
+avro.schema.string  = primitive_schema("string",  ACC.STRING,  assert(AW.StringValue))
 
 
 ------------------------------------------------------------------------
 -- Arrays and maps
 
-ArraySchema = {}
+local ArraySchema = {}
+avro.schema.ArraySchema = ArraySchema
+
 ArraySchema.__mt = { __index=ArraySchema }
 setmetatable(ArraySchema, { __index=Schema })
 
@@ -199,7 +205,9 @@ function ArraySchema:clone(clones)
 end
 
 
-MapSchema = {}
+local MapSchema = {}
+avro.schema.MapSchema = MapSchema
+
 MapSchema.__mt = { __index=MapSchema }
 setmetatable(MapSchema, { __index=Schema })
 
@@ -238,7 +246,9 @@ end
 ------------------------------------------------------------------------
 -- Enums
 
-EnumSchema = {}
+local EnumSchema = {}
+avro.schema.EnumSchema = EnumSchema
+
 EnumSchema.__mt = { __index=EnumSchema }
 setmetatable(EnumSchema, { __index=Schema })
 
@@ -300,7 +310,9 @@ end
 ------------------------------------------------------------------------
 -- Fixeds
 
-FixedSchema = {}
+local FixedSchema = {}
+avro.schema.FixedSchema = FixedSchema
+
 FixedSchema.__mt = { __index=FixedSchema }
 setmetatable(FixedSchema, { __index=Schema })
 
@@ -342,7 +354,9 @@ end
 ------------------------------------------------------------------------
 -- Records
 
-RecordSchema = {}
+local RecordSchema = {}
+avro.schema.RecordSchema = RecordSchema
+
 RecordSchema.__mt = { __index=RecordSchema }
 setmetatable(RecordSchema, { __index=Schema })
 
@@ -442,7 +456,9 @@ end
 ------------------------------------------------------------------------
 -- Unions
 
-UnionSchema = {}
+local UnionSchema = {}
+avro.schema.UnionSchema = UnionSchema
+
 UnionSchema.__mt = { __index=UnionSchema }
 setmetatable(UnionSchema, { __index=Schema })
 
@@ -701,7 +717,7 @@ local function save_link(name, schema)
    LINK_TARGETS[name] = schema
 end
 
-function link(name)
+function avro.schema.link(name)
    if not LINK_TARGETS[name] then
       error("No schema named "..name)
    else
@@ -715,7 +731,7 @@ end
 --   local schema = array { item_schema }
 --   local schema = array(item_schema)
 
-function array(args)
+function avro.schema.array(args)
    --print("--- array")
    init_links()
    local item_schema = args[1] or args
@@ -723,7 +739,7 @@ function array(args)
    return ArraySchema:new(item_schema)
 end
 
-function map(args)
+function avro.schema.map(args)
    --print("--- map")
    init_links()
    local value_schema = args[1] or args
@@ -735,7 +751,7 @@ end
 --
 --   local schema = enum "color" { "RED", "GREEN", "BLUE" }
 
-function enum(name)
+function avro.schema.enum(name)
    --print("--- enum "..name)
    init_links()
    return function (symbols)
@@ -754,7 +770,7 @@ end
 --   local schema = fixed "ipv4" { size=4 }
 --   local schema = fixed "ipv4"(4)
 
-function fixed(name)
+function avro.schema.fixed(name)
    --print("--- fixed "..name)
    init_links()
    return function (args)
@@ -801,7 +817,7 @@ end
 -- lets us ensure that the fields appear in the schema in the same order
 -- they appear in the Lua source code.
 
-function record(name)
+function avro.schema.record(name)
    --print("--- record "..name)
    init_links()
    local schema = RecordSchema:new(name)
@@ -827,7 +843,7 @@ end
 --
 --   local schema = union { branch_schemas }
 
-function union(branches)
+function avro.schema.union(branches)
    --print("--- union")
    init_links()
    local schema = UnionSchema:new()
@@ -837,3 +853,5 @@ function union(branches)
    done_links()
    return schema
 end
+
+return avro.schema

@@ -26,7 +26,8 @@ local type = type
 
 local ffi_present = pcall(require, "ffi")
 
-module "avro.wrapper"
+local avro = require "avro.module"
+avro.wrapper = {}
 
 -- This module provides a framework for creating wrapper classes around
 -- the raw Avro values returned by the avro.c module.  We provide a
@@ -79,11 +80,11 @@ module "avro.wrapper"
 
 local WRAPPERS = {}
 
-function get_wrapper_class(schema_name)
+function avro.wrapper.get_wrapper_class(schema_name)
    return WRAPPERS[schema_name]
 end
 
-function set_wrapper_class(schema_name, wrapper)
+function avro.wrapper.set_wrapper_class(schema_name, wrapper)
    WRAPPERS[schema_name] = wrapper
 end
 
@@ -91,7 +92,9 @@ end
 ------------------------------------------------------------------------
 -- Wrapper superclass
 
-Wrapper = {}
+local Wrapper = {}
+avro.wrapper.Wrapper = Wrapper
+
 Wrapper.__name = "Wrapper"
 Wrapper.__mt = { __class=Wrapper, __index=Wrapper }
 
@@ -144,7 +147,8 @@ end
 ------------------------------------------------------------------------
 -- Default scalar value wrappers
 
-ScalarValue = Wrapper:subclass("ScalarValue")
+local ScalarValue = Wrapper:subclass("ScalarValue")
+avro.wrapper.ScalarValue = ScalarValue
 
 function ScalarValue:new_wrapped()
    return nil
@@ -162,7 +166,8 @@ function ScalarValue:fill_from(wrapped)
    return self.raw
 end
 
-StringValue = Wrapper:subclass("StringValue")
+local StringValue = Wrapper:subclass("StringValue")
+avro.wrapper.StringValue = StringValue
 
 StringValue.new_wrapped = ScalarValue.new_wrapped
 StringValue.wrap = ScalarValue.wrap
@@ -172,7 +177,8 @@ function StringValue:tostring()
    return string.format("%q", self.wrapped)
 end
 
-LongValue = Wrapper:subclass("LongValue")
+local LongValue = Wrapper:subclass("LongValue")
+avro.wrapper.LongValue = LongValue
 
 LongValue.new_wrapped = ScalarValue.new_wrapped
 LongValue.wrap = ScalarValue.wrap
@@ -190,7 +196,8 @@ end
 ------------------------------------------------------------------------
 -- Compound value superclass
 
-CompoundValue = Wrapper:subclass("CompoundValue")
+local CompoundValue = Wrapper:subclass("CompoundValue")
+avro.wrapper.CompoundValue = CompoundValue
 
 function CompoundValue:cmp(other)
    return self.raw:cmp(other.raw)
@@ -238,7 +245,6 @@ function CompoundValue.__mt:__eq(other)
    return self.raw == other.raw
 end
 
-
 function CompoundValue:new()
    local obj = { raw=nil, children={} }
    return setmetatable(obj, self.__mt)
@@ -268,7 +274,8 @@ end
 ------------------------------------------------------------------------
 -- Array
 
-ArrayValue = CompoundValue:subclass("ArrayValue")
+local ArrayValue = CompoundValue:subclass("ArrayValue")
+avro.wrapper.ArrayValue = ArrayValue
 
 function ArrayValue:get_child(idx)
    if not self.children[idx] then
@@ -353,7 +360,8 @@ end
 ------------------------------------------------------------------------
 -- Map
 
-MapValue = CompoundValue:subclass("MapValue")
+local MapValue = CompoundValue:subclass("MapValue")
+avro.wrapper.MapValue = MapValue
 
 function MapValue:get_child(idx)
    if not self.children[idx] then
@@ -426,7 +434,8 @@ end
 ------------------------------------------------------------------------
 -- Record
 
-RecordValue = CompoundValue:subclass("RecordValue")
+local RecordValue = CompoundValue:subclass("RecordValue")
+avro.wrapper.RecordValue = RecordValue
 
 function RecordValue:get_child(idx)
    local real_index = self.__real_indices[idx]
@@ -494,7 +503,8 @@ end
 ------------------------------------------------------------------------
 -- Union
 
-UnionValue = CompoundValue:subclass("UnionValue")
+local UnionValue = CompoundValue:subclass("UnionValue")
+avro.wrapper.UnionValue = UnionValue
 
 function UnionValue:get_child(idx)
    local real_index = self.__real_indices[idx]
@@ -590,3 +600,5 @@ function UnionValue.__mt:__newindex(idx, val)
       child:fill_from(val)
    end
 end
+
+return avro.wrapper
