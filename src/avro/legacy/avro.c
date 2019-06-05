@@ -2080,6 +2080,8 @@ luaopen_avro_legacy_avro(lua_State *L)
     lua_setfield(L, -2, "__gc");
     lua_pop(L, 1);
 
-    luaL_register(L, "avro.legacy.avro", mod_methods);
+    lua_newtable(L);
+    luaL_register(L, NULL, mod_methods);
+
     return 1;
 }

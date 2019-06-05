@@ -7,8 +7,6 @@ sudo: true
 python:
   - "2.7"
 
-sudo: false
-
 addons:
   apt:
     packages:

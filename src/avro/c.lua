@@ -9,15 +9,16 @@
 -- Loads either avro.legacy.avro or avro.ffi.avro, depending on whether
 -- the LuaJIT FFI module is available.
 
+local avro = require "avro.module"
+
 local ffi_present = pcall(require, "ffi")
-local mod
 if ffi_present then
-   --print("Loading ffi version")
-   mod = require("avro.ffi.avro")
+   -- print("Loading ffi version")
+   avro.c = require("avro.ffi.avro")
 else
-   --print("Loading legacy version")
-   mod = require("avro.legacy.avro")
+   -- print("Loading legacy version")
+   avro.c = require("avro.legacy.avro")
 end
-mod.ffi_present = ffi_present
-avro.c = mod
-return mod
+avro.c.ffi_present = ffi_present
+
+return avro.c
