@@ -10,7 +10,8 @@ return {
   };
 
   exclude = {
-    "/avro/dkjson$"
+    "/avro/dkjson$",
+    "/here/.+$",
   };
 
   coveralls = {
