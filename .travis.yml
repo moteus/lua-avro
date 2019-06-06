@@ -48,7 +48,8 @@ script:
   - lua -l luacov -l avro.test -v
 
 after_success:
-  - luacov-coveralls -v
+  - coveralls -b .. -r .. --dump c.report.json
+  - luacov-coveralls -j c.report.json -v
 
 notifications:
   email:
