@@ -1,6 +1,7 @@
 # Lua Avro bindings
 
 [![Build Status](https://travis-ci.org/moteus/lua-avro.svg?branch=master)](https://travis-ci.org/moteus/lua-avro)
+[![Coverage Status](https://coveralls.io/repos/github/moteus/lua-avro/badge.svg?branch=master)](https://coveralls.io/github/moteus/lua-avro?branch=master)
 
 This package provides Lua bindings for the [Avro][] data serialization
 framework.  It relies on Avro's C bindings to do the heavy lifting.
