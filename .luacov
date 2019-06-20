@@ -11,6 +11,8 @@ return {
 
   exclude = {
     "/avro/dkjson$",
+    "/avro/test$",
+    "/avro/tests/.+$",
   };
 
   coveralls = {
